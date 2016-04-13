@@ -1,1 +1,92 @@
-My Page
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Smoothing</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/paper-full.js"></script>
+    <script type="text/paperscript" canvas="canvas">
+        var width, height, center;
+        var points = 8;
+        var smooth = true;
+        var path2 = new Path({
+            fillColor: '#87F528'
+        });
+        var path = new Path({
+            fillColor: 'green'
+        });
+        var mousePos = view.center / 2;
+        var pathHeight = mousePos.y;
+        initializePath();
+
+        function initializePath() {
+            center = view.center;
+            width = view.size.width;
+            height = view.size.height / 3;
+            path2.segments = [];
+            path2.add(view.bounds.topLeft);
+            path.segments = [];
+            path.add(view.bounds.bottomLeft);
+            for (var i = 1; i < points; i++) {
+                var point = new Point(width / points * i, center.y);
+                path2.add(point);
+            }
+            for (var i = 1; i < points; i++) {
+                var point = new Point(width / points * i, 800);
+                path.add(point);
+            }
+            path2.add(view.bounds.topRight);
+            path2.fullySelected = false;
+            path.add(view.bounds.bottomRight);
+            path.fullySelected = false;
+        }
+
+        function onFrame(event) {
+            pathHeight += (center.y - mousePos.y - pathHeight) / 10;
+            for (var i = 1; i < points; i++) {
+                var sinSeed = event.count + (i + i % 10) * 100;
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight;
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height;
+                path2.segments[i].point.y = yPos;
+            }
+            for (var i = 1; i < points; i++) {
+                var sinSeed = event.count + (i + i % 10) * 100;
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight;
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height;
+                path.segments[i].point.y = yPos;
+            }
+            if (smooth)
+                path2.smooth();
+                path.smooth();
+        }
+
+        function onMouseMove(event) {
+            mousePos = event.point;
+        }
+
+        function onMouseDown(event) {
+            smooth = !smooth;
+            if (!smooth) {
+                // If smooth has been turned off, we need to reset
+                // the handles of the path:
+                for (var i = 0, l = path2.segments.length; i < l; i++) {
+                    var segment = path2.segments[i];
+                    var segment = path.segments[i];
+                    segment.handleIn = segment.handleOut = null;
+                }
+            }
+        }
+
+        // Reposition the path whenever the window is resized:
+        function onResize(event) {
+            initializePath();
+        }
+    </script>
+
+
+</head>
+<body bgcolor="#F52887">
+    <canvas id="canvas" resize></canvas>
+
+</body>
+</html>
