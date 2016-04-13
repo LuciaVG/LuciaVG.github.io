@@ -22,7 +22,7 @@
         function initializePath() {
             center = view.center;
             width = view.size.width;
-            height = view.size.height / 3;
+            height = view.size.height / 2;
             path2.segments = [];
             path2.add(view.bounds.topLeft);
             path.segments = [];
@@ -31,8 +31,8 @@
                 var point = new Point(width / points * i, center.y);
                 path2.add(point);
             }
-            for (var i = 1; i < points; i++) {
-                var point = new Point(width / points * i, 800);
+            for (var i = 1; i < points/2; i++) {
+                var point = new Point(width / points * i, center.y/2);
                 path.add(point);
             }
             path2.add(view.bounds.topRight);
@@ -49,7 +49,7 @@
                 var yPos = Math.sin(sinSeed / 100) * sinHeight + height;
                 path2.segments[i].point.y = yPos;
             }
-            for (var i = 1; i < points; i++) {
+            for (var i = 1; i < points/2; i++) {
                 var sinSeed = event.count + (i + i % 10) * 100;
                 var sinHeight = Math.sin(sinSeed / 200) * pathHeight;
                 var yPos = Math.sin(sinSeed / 100) * sinHeight + height;
@@ -71,6 +71,9 @@
                 // the handles of the path:
                 for (var i = 0, l = path2.segments.length; i < l; i++) {
                     var segment = path2.segments[i];
+                    segment.handleIn = segment.handleOut = null;
+                }
+                for (var i = 0, l = path.segments.length; i < l; i++) {
                     var segment = path.segments[i];
                     segment.handleIn = segment.handleOut = null;
                 }
