@@ -6,15 +6,20 @@
     <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="js/paper-full.js"></script>
     <script type="text/paperscript" canvas="canvas">
+
         var width, height, center;
-        var points = 8;
+        var points = 12;
         var smooth = true;
-        var path2 = new Path({
-            fillColor: '#87F528'
-        });
         var path = new Path({
-            fillColor: 'green'
+            fillColor: '#FF8919'
         });
+        var path3 = new Path({
+            fillColor: '#fffb19'
+        });
+        var path2 = new Path({
+            fillColor: '#90FF19'
+        });
+
         var mousePos = view.center / 2;
         var pathHeight = mousePos.y;
         initializePath();
@@ -23,62 +28,66 @@
             center = view.center;
             width = view.size.width;
             height = view.size.height / 2;
-            path2.segments = [];
-            path2.add(view.bounds.topLeft);
             path.segments = [];
             path.add(view.bounds.bottomLeft);
-            for (var i = 1; i < points; i++) {
-                var point = new Point(width / points * i, center.y);
-                path2.add(point);
-            }
-            for (var i = 1; i < points/2; i++) {
-                var point = new Point(width / points * i, center.y/2);
+            path3.segments = [];
+            path3.add(view.bounds.bottomLeft);
+            path2.segments = [];
+            path2.add(view.bounds.bottomLeft);
+            for (var i = 0; i < points/2; i++) {
+                var point = new Point(width*1.2 / points*2 * i, center.y);
                 path.add(point);
             }
-            path2.add(view.bounds.topRight);
-            path2.fullySelected = false;
+            for (var i = 0; i < points; i++) {
+                var point = new Point(width*1.2 / points * i, 100);
+                path2.add(point);
+            }
+            for (var i = 0; i < points-2; i++) {
+                var point = new Point(width*1.2 / (points-2) * i, 100);
+                path3.add(point);
+            }
             path.add(view.bounds.bottomRight);
             path.fullySelected = false;
+            path3.add(view.bounds.bottomRight);
+            path3.fullySelected = false;
+            path2.add(view.bounds.bottomRight);
+            path2.fullySelected = false;
+
         }
 
         function onFrame(event) {
             pathHeight += (center.y - mousePos.y - pathHeight) / 10;
             for (var i = 1; i < points; i++) {
-                var sinSeed = event.count + (i + i % 10) * 100;
-                var sinHeight = Math.sin(sinSeed / 200) * pathHeight;
-                var yPos = Math.sin(sinSeed / 100) * sinHeight + height;
+                var sinSeed = event.count + (i + i % 10) * 100 * 1.5;
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight * 1.5;
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height * 1.5;
                 path2.segments[i].point.y = yPos;
             }
             for (var i = 1; i < points/2; i++) {
-                var sinSeed = event.count + (i + i % 10) * 100;
-                var sinHeight = Math.sin(sinSeed / 200) * pathHeight;
-                var yPos = Math.sin(sinSeed / 100) * sinHeight + height;
+                var sinSeed = event.count + (i + i % 10) * 100 * .7;
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight * .7;
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height * .7;
                 path.segments[i].point.y = yPos;
             }
-            if (smooth)
-                path2.smooth();
+
+            for (var i = 1; i < points-2; i++) {
+                var sinSeed = event.count + (i + i % 10) * 100 * 1.2;
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight * 1.2;
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height * 1.2;
+                path3.segments[i].point.y = yPos;
+            }
+
                 path.smooth();
+                path2.smooth();
+                path3.smooth();
+
+
         }
 
         function onMouseMove(event) {
             mousePos = event.point;
         }
 
-        function onMouseDown(event) {
-            smooth = !smooth;
-            if (!smooth) {
-                // If smooth has been turned off, we need to reset
-                // the handles of the path:
-                for (var i = 0, l = path2.segments.length; i < l; i++) {
-                    var segment = path2.segments[i];
-                    segment.handleIn = segment.handleOut = null;
-                }
-                for (var i = 0, l = path.segments.length; i < l; i++) {
-                    var segment = path.segments[i];
-                    segment.handleIn = segment.handleOut = null;
-                }
-            }
-        }
 
         // Reposition the path whenever the window is resized:
         function onResize(event) {
@@ -88,7 +97,8 @@
 
 
 </head>
-<body bgcolor="#F52887">
+<body bgcolor="#FF1990">
+
     <canvas id="canvas" resize></canvas>
 
 </body>
