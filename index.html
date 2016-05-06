@@ -2,41 +2,71 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
     <title>Smoothing</title>
     <link rel="stylesheet" href="css/style.css">
     <script type="text/javascript" src="js/paper-full.js"></script>
-    <script type="text/paperscript" canvas="canvas">
-        var json = {color:['#FF8919','#fffb19','#90FF19'], points:12, width:view.size.width, height:view.size.height/2, center:view.center, mousePos:view.center/2, pathHeight:(view.center/2).y};
-        var path = new Path({
-            fillColor: json.color[0]
-        });
-        var path3 = new Path({
-            fillColor: json.color[1]
-        });
-        var path2 = new Path({
-            fillColor: json.color[2]
-        });
 
-        initializePath();
+    <script onload>
+    var murl, path3, path2, path, points, num,width, height, center;
+
+
+    var wait = $.getJSON("https://api.myjson.com/bins/361lk",
+
+    function(datos){
+        murl = datos;
+    });
+
+
+
+    </script>
+
+    <script type="text/paperscript" canvas="canvas">
+
+    wait.complete(function() {
+       path = new Path({
+          fillColor: murl.color[0]
+      });
+       path3 = new Path({
+          fillColor: murl.color[1]
+      });
+       path2 = new Path({
+          fillColor: murl.color[2]
+      });
+
+      points=murl.points;
+      num=murl.constant;
+
+  });
+
+        var mousePos = view.center / 2;
+        var pathHeight = mousePos.y;
+
 
         function initializePath() {
+          wait.complete(function() {
 
+
+            center = view.center;
+            width = view.size.width;
+            height = view.size.height / 2;
             path.segments = [];
             path.add(view.bounds.bottomLeft);
             path3.segments = [];
             path3.add(view.bounds.bottomLeft);
             path2.segments = [];
             path2.add(view.bounds.bottomLeft);
-            for (var i = 0; i < json.points/2; i++) {
-                var point = new Point(json.width*1.2 / json.points*2 * i, json.center.y);
+            for (var i = 0; i < points[0]; i++) {
+                var point = new Point(width*1.2 / points[0]*i, center.y);
                 path.add(point);
             }
-            for (var i = 0; i < json.points; i++) {
-                var point = new Point(json.width*1.2 / json.points * i, 100);
+            for (var i = 0; i < points[1]; i++) {
+                var point = new Point(width*1.2 / points[1] * i, 100);
                 path2.add(point);
             }
-            for (var i = 0; i < json.points-2; i++) {
-                var point = new Point(json.width*1.2 / (json.points-2) * i, 100);
+            for (var i = 0; i < points[2]; i++) {
+                var point = new Point(width*1.2 / points[2] * i, 100);
                 path3.add(point);
             }
             path.add(view.bounds.bottomRight);
@@ -45,54 +75,54 @@
             path3.fullySelected = false;
             path2.add(view.bounds.bottomRight);
             path2.fullySelected = false;
-
+});
         }
 
         function onFrame(event) {
-            json.pathHeight += (json.center.y - json.mousePos.y - json.pathHeight) / 10;
-            for (var i = 1; i < json.points; i++) {
-                var sinSeed = event.count + (i + i % 10) * 100 * 1.5;
-                var sinHeight = Math.sin(sinSeed / 200) * json.pathHeight * 1.5;
-                var yPos = Math.sin(sinSeed / 100) * sinHeight + json.height * 1.5;
+          wait.complete(function() {
+
+            pathHeight += (center.y - mousePos.y - pathHeight) / 10;
+            for (var i = 1; i < points[1]; i++) {
+                var sinSeed = event.count + (i + i % 10) * 100 * num[2];
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight * num[2];
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height * num[2];
                 path2.segments[i].point.y = yPos;
             }
-            for (var i = 1; i < json.points/2; i++) {
-                var sinSeed = event.count + (i + i % 10) * 100 * .7;
-                var sinHeight = Math.sin(sinSeed / 200) * json.pathHeight * .7;
-                var yPos = Math.sin(sinSeed / 100) * sinHeight + json.height * .7;
+            for (var i = 1; i < points[0]; i++) {
+                var sinSeed = event.count + (i + i % 10) * 100 *num[0];
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight * num[0];
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height * num[0];
                 path.segments[i].point.y = yPos;
             }
 
-            for (var i = 1; i < json.points-2; i++) {
-                var sinSeed = event.count + (i + i % 10) * 100 * 1.2;
-                var sinHeight = Math.sin(sinSeed / 200) * json.pathHeight * 1.2;
-                var yPos = Math.sin(sinSeed / 100) * sinHeight + json.height * 1.2;
+            for (var i = 1; i < points[2]; i++) {
+                var sinSeed = event.count + (i + i % 10) * 100 * num[1];
+                var sinHeight = Math.sin(sinSeed / 200) * pathHeight * num[1];
+                var yPos = Math.sin(sinSeed / 100) * sinHeight + height * num[1];
                 path3.segments[i].point.y = yPos;
             }
 
                 path.smooth();
                 path2.smooth();
                 path3.smooth();
+              });
 
 
         }
 
         function onMouseMove(event) {
-            json.mousePos = event.point;
+            mousePos = event.point;
         }
 
 
-        // Reposition the path whenever the window is resized:
+
         function onResize(event) {
             initializePath();
         }
     </script>
 
-
 </head>
 <body bgcolor="#FF1990">
-
     <canvas id="canvas" resize></canvas>
-
 </body>
 </html>
