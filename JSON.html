@@ -1,0 +1,40 @@
+<!doctype html>
+<htm>
+    <head>
+        <meta charset="UTF-8">
+        <title>JSON</title>
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    </head>
+    <body align="center">
+      <br><br>
+      <br><br>
+      <img id="myImg" src=""  style="width:450px;height:450;">
+
+      <br><br>
+      <input type="text" id="myText" value="Type artist">
+
+      <button onclick="myFunction()">Get image</button>
+
+      <script>
+          var x;
+          var myurl;
+          function myFunction() {
+          var image = document.getElementById('myImg');
+
+          x = String(document.getElementById("myText").value);
+          myurl = String("http://api.spotify.com/v1/search?q="+x+"&type=artist");
+          console.log();
+          $.getJSON(myurl,
+
+          function(datos){
+              murl = String(datos.artists.items[0].images[0].url);
+              var flw = datos.artists.items[0].followers.total;
+              console.log(flw);
+              image.src = murl;
+          });
+        }
+
+        </script>
+        <div id="hi"></div>
+    </body>
+</htm>
